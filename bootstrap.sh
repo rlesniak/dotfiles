@@ -39,8 +39,10 @@ if [ ! -d "$(chezmoi source-path 2>/dev/null)" ]; then
   chezmoi init https://github.com/rlesniak/dotfiles.git
 fi
 
-# 5. chezmoi.toml — ensure Bitwarden item IDs are configured locally
+# 5. chezmoi.toml — ensure required data is configured locally
 CHEZMOI_CONFIG="$HOME/.config/chezmoi/chezmoi.toml"
+
+# Collect missing values
 if ! grep -q "bw_id_rlesniak" "$CHEZMOI_CONFIG" 2>/dev/null; then
   echo ""
   echo "==> Bitwarden SSH key IDs not found in chezmoi config."
@@ -49,24 +51,40 @@ if ! grep -q "bw_id_rlesniak" "$CHEZMOI_CONFIG" 2>/dev/null; then
   echo ""
   read -rp "    Bitwarden item ID for id_rlesniak:  " BW_ID_RLESNIAK
   read -rp "    Bitwarden item ID for id_rsa_akiro: " BW_ID_RSA_AKIRO
+  WRITE_BW_IDS=1
+fi
+
+if ! grep -q "git_email" "$CHEZMOI_CONFIG" 2>/dev/null; then
+  echo ""
+  echo "==> Git email not found in chezmoi config."
+  read -rp "    Git email address: " GIT_EMAIL
+  WRITE_GIT_EMAIL=1
+fi
+
+# Write collected values to config
+if [ -n "$WRITE_BW_IDS" ] || [ -n "$WRITE_GIT_EMAIL" ]; then
   mkdir -p "$(dirname "$CHEZMOI_CONFIG")"
   if grep -q "sourceDir" "$CHEZMOI_CONFIG" 2>/dev/null; then
-    # Config exists, append [data] section
-    cat >> "$CHEZMOI_CONFIG" <<EOF
-
-[data]
-  bw_id_rlesniak = "$BW_ID_RLESNIAK"
-  bw_id_rsa_akiro = "$BW_ID_RSA_AKIRO"
-EOF
+    # Config exists — append only the [data] entries that are new
+    if grep -q "\[data\]" "$CHEZMOI_CONFIG" 2>/dev/null; then
+      # [data] section exists, append new keys inside it
+      [ -n "$WRITE_BW_IDS" ] && printf '  bw_id_rlesniak = "%s"\n  bw_id_rsa_akiro = "%s"\n' "$BW_ID_RLESNIAK" "$BW_ID_RSA_AKIRO" >> "$CHEZMOI_CONFIG"
+      [ -n "$WRITE_GIT_EMAIL" ] && printf '  git_email = "%s"\n' "$GIT_EMAIL" >> "$CHEZMOI_CONFIG"
+    else
+      # No [data] section yet
+      {
+        printf '\n[data]\n'
+        [ -n "$WRITE_BW_IDS" ] && printf '  bw_id_rlesniak = "%s"\n  bw_id_rsa_akiro = "%s"\n' "$BW_ID_RLESNIAK" "$BW_ID_RSA_AKIRO"
+        [ -n "$WRITE_GIT_EMAIL" ] && printf '  git_email = "%s"\n' "$GIT_EMAIL"
+      } >> "$CHEZMOI_CONFIG"
+    fi
   else
-    # Config doesn't exist, create it
-    cat > "$CHEZMOI_CONFIG" <<EOF
-sourceDir = "~/workspace/dotfiles"
-
-[data]
-  bw_id_rlesniak = "$BW_ID_RLESNIAK"
-  bw_id_rsa_akiro = "$BW_ID_RSA_AKIRO"
-EOF
+    # Config doesn't exist, create it fresh
+    {
+      printf 'sourceDir = "~/workspace/dotfiles"\n\n[data]\n'
+      [ -n "$WRITE_BW_IDS" ] && printf '  bw_id_rlesniak = "%s"\n  bw_id_rsa_akiro = "%s"\n' "$BW_ID_RLESNIAK" "$BW_ID_RSA_AKIRO"
+      [ -n "$WRITE_GIT_EMAIL" ] && printf '  git_email = "%s"\n' "$GIT_EMAIL"
+    } > "$CHEZMOI_CONFIG"
   fi
   echo "==> Saved to $CHEZMOI_CONFIG"
 fi
