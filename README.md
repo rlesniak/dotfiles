@@ -39,15 +39,17 @@ chezmoi apply ~/.ssh/id_ed25519 ~/.ssh/id_rsa_akiro
 | Sync zmian z dysku | `chezmoi re-add ~/.config/fish/config.fish` |
 | Commit | `chezmoi cd && git add -A && git commit -m "..." && git push` |
 | Sync na innym Macu | `chezmoi update` |
+| Ponów macOS defaults | `bash run_once_after_macos.sh` |
 
 ## Struktura repo
 
 ```
 dotfiles/
-├── Brewfile              # Homebrew packages
-├── bootstrap.sh          # Instalacja na nowym Macu
+├── Brewfile                 # Homebrew packages
+├── bootstrap.sh             # Instalacja na nowym Macu
+├── run_once_after_macos.sh  # macOS system defaults
 └── dot_config/
-    ├── fish/             # Fish shell config
-    ├── vscode/           # VS Code settings + extensions list
-    └── zed/              # Zed settings
+    ├── fish/                # Fish shell config
+    ├── vscode/              # VS Code settings + extensions list
+    └── zed/                 # Zed settings
 ```
