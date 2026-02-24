@@ -1,11 +1,11 @@
 {{- if (output "bw" "status" | fromJson).status | eq "unlocked" -}}
 
-[".ssh/id_ed25519"]
+[".ssh/id_rlesniak"]
     type = "file"
     permissions = 0600
-    [".ssh/id_ed25519".contents]
+    [".ssh/id_rlesniak".contents]
         command = "bw"
-        args = ["get", "notes", "{{ .bw_id_ed25519 }}"]
+        args = ["get", "notes", "{{ .bw_id_rlesniak }}"]
 
 [".ssh/id_rsa_akiro"]
     type = "file"

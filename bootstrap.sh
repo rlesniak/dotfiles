@@ -41,13 +41,13 @@ fi
 
 # 5. chezmoi.toml — ensure Bitwarden item IDs are configured locally
 CHEZMOI_CONFIG="$HOME/.config/chezmoi/chezmoi.toml"
-if ! grep -q "bw_id_ed25519" "$CHEZMOI_CONFIG" 2>/dev/null; then
+if ! grep -q "bw_id_rlesniak" "$CHEZMOI_CONFIG" 2>/dev/null; then
   echo ""
   echo "==> Bitwarden SSH key IDs not found in chezmoi config."
   echo "    These are the Bitwarden item IDs for your SSH keys (not passwords)."
   echo "    Find them with: bw list items --search 'SSH Key'"
   echo ""
-  read -rp "    Bitwarden item ID for id_ed25519:   " BW_ID_ED25519
+  read -rp "    Bitwarden item ID for id_rlesniak:  " BW_ID_RLESNIAK
   read -rp "    Bitwarden item ID for id_rsa_akiro: " BW_ID_RSA_AKIRO
   mkdir -p "$(dirname "$CHEZMOI_CONFIG")"
   if grep -q "sourceDir" "$CHEZMOI_CONFIG" 2>/dev/null; then
@@ -55,7 +55,7 @@ if ! grep -q "bw_id_ed25519" "$CHEZMOI_CONFIG" 2>/dev/null; then
     cat >> "$CHEZMOI_CONFIG" <<EOF
 
 [data]
-  bw_id_ed25519 = "$BW_ID_ED25519"
+  bw_id_rlesniak = "$BW_ID_RLESNIAK"
   bw_id_rsa_akiro = "$BW_ID_RSA_AKIRO"
 EOF
   else
@@ -64,7 +64,7 @@ EOF
 sourceDir = "~/workspace/dotfiles"
 
 [data]
-  bw_id_ed25519 = "$BW_ID_ED25519"
+  bw_id_rlesniak = "$BW_ID_RLESNIAK"
   bw_id_rsa_akiro = "$BW_ID_RSA_AKIRO"
 EOF
   fi

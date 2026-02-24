@@ -6,7 +6,7 @@
 Host private
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/id_rlesniak
     IdentitiesOnly yes
 
 # Company GitHub Account
@@ -21,5 +21,5 @@ Host github.com
     HostName ssh.github.com
     Port 443
     User git
-    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/id_rlesniak
     IdentitiesOnly yes
