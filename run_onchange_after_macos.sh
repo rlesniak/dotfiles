@@ -28,6 +28,9 @@ defaults write com.apple.dock launchanim -bool false
 # Don't show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
+# Remove all app icons from Dock
+defaults write com.apple.dock persistent-apps -array
+
 ###############################################################################
 # Finder                                                                      #
 ###############################################################################
