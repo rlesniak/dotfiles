@@ -1,0 +1,17 @@
+{{- if (output "bw" "status" | fromJson).status | eq "unlocked" -}}
+
+[".ssh/id_ed25519"]
+    type = "file"
+    permissions = 0600
+    [".ssh/id_ed25519".contents]
+        command = "bw"
+        args = ["get", "notes", "7c73d4ef-ca3b-441a-bf7c-b3fb012c5298"]
+
+[".ssh/id_rsa_akiro"]
+    type = "file"
+    permissions = 0600
+    [".ssh/id_rsa_akiro".contents]
+        command = "bw"
+        args = ["get", "notes", "f3ca7f20-fc94-4ea0-be80-b3fb012ca9a6"]
+
+{{- end -}}

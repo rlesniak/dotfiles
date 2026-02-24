@@ -5,6 +5,7 @@ tap "tw93/tap"
 
 # CLI tools
 brew "bat"
+brew "bitwarden-cli"
 brew "coreutils"
 brew "ffmpeg"
 brew "fish"
