@@ -2,14 +2,14 @@
 
 [".ssh/id_rlesniak"]
     type = "file"
-    permissions = 0600
+    permissions = 0o600
     [".ssh/id_rlesniak".contents]
         command = "bw"
         args = ["get", "notes", "{{ .bw_id_rlesniak }}"]
 
 [".ssh/id_rsa_akiro"]
     type = "file"
-    permissions = 0600
+    permissions = 0o600
     [".ssh/id_rsa_akiro".contents]
         command = "bw"
         args = ["get", "notes", "{{ .bw_id_rsa_akiro }}"]
