@@ -1,3 +1,7 @@
+# SSH config managed by chezmoi.
+# Note: OrbStack adds its own Include block automatically after installation.
+# VPS-specific hosts (IPs) are not tracked here — add them manually per machine.
+
 # Personal GitHub Account
 Host private
     HostName github.com
