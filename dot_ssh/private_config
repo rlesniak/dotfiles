@@ -1,0 +1,21 @@
+# Personal GitHub Account
+Host private
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+# Company GitHub Account
+Host akiro
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_rsa_akiro
+    IdentitiesOnly yes
+
+# GitHub via port 443 (if port 22 is blocked)
+Host github.com
+    HostName ssh.github.com
+    Port 443
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
