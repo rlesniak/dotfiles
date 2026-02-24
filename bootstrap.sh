@@ -15,7 +15,6 @@ fi
 if ! command -v brew &>/dev/null; then
   echo "==> Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # Add brew to PATH for Apple Silicon
   if [ -f /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
@@ -28,18 +27,23 @@ elif [ -f /usr/local/bin/brew ]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-# 3. chezmoi
+# 3. chezmoi (needed to locate Brewfile)
 if ! command -v chezmoi &>/dev/null; then
   echo "==> Installing chezmoi..."
   brew install chezmoi
 fi
 
-# 4. Bitwarden — unlock for SSH key retrieval
-if ! command -v bw &>/dev/null; then
-  echo "==> Installing Bitwarden CLI..."
-  brew install bitwarden-cli
+# 4. Clone dotfiles repo (without apply) to get Brewfile
+if [ ! -d "$(chezmoi source-path 2>/dev/null)" ]; then
+  echo "==> Cloning dotfiles..."
+  chezmoi init https://github.com/rlesniak/dotfiles.git
 fi
 
+# 5. Brew bundle — installs all packages including bitwarden-cli and fish
+echo "==> Installing packages from Brewfile..."
+brew bundle --file="$(chezmoi source-path)/Brewfile"
+
+# 6. Bitwarden — unlock for SSH key retrieval
 BW_STATUS="$(bw status 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unauthenticated'))" 2>/dev/null || echo "unauthenticated")"
 
 if [ "$BW_STATUS" = "unauthenticated" ]; then
@@ -54,18 +58,13 @@ else
   echo "==> Bitwarden already unlocked."
 fi
 
-# 5. Clone dotfiles i apply (includes SSH key retrieval from Bitwarden)
+# 7. Apply dotfiles (includes SSH key retrieval from Bitwarden)
 echo "==> Applying dotfiles..."
-chezmoi init --apply https://github.com/rlesniak/dotfiles.git
+chezmoi apply
 
-# 6. Brew bundle
-echo "==> Installing packages from Brewfile..."
-brew bundle --file="$(chezmoi source-path)/Brewfile"
-
-# 7. Set fish as default shell
+# 8. Set fish as default shell
 FISH_PATH="$(command -v fish 2>/dev/null)"
 if [ -z "$FISH_PATH" ]; then
-  # Fallback: detect brew prefix
   BREW_PREFIX="$(brew --prefix 2>/dev/null || echo /opt/homebrew)"
   FISH_PATH="$BREW_PREFIX/bin/fish"
 fi
@@ -80,7 +79,7 @@ if [ -f "$FISH_PATH" ]; then
   fi
 fi
 
-# 8. Fisher plugins
+# 9. Fisher plugins
 echo "==> Installing fish plugins..."
 "$FISH_PATH" -c "fisher update" 2>/dev/null || echo "Note: fisher update failed, run manually: fisher update"
 
