@@ -1,0 +1,3 @@
+# VS Code - managed by run_once_after_vscode.sh instead
+.config/vscode
+.config/vscode/**
