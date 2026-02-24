@@ -39,11 +39,43 @@ if [ ! -d "$(chezmoi source-path 2>/dev/null)" ]; then
   chezmoi init https://github.com/rlesniak/dotfiles.git
 fi
 
-# 5. Brew bundle — installs all packages including bitwarden-cli and fish
+# 5. chezmoi.toml — ensure Bitwarden item IDs are configured locally
+CHEZMOI_CONFIG="$HOME/.config/chezmoi/chezmoi.toml"
+if ! grep -q "bw_id_ed25519" "$CHEZMOI_CONFIG" 2>/dev/null; then
+  echo ""
+  echo "==> Bitwarden SSH key IDs not found in chezmoi config."
+  echo "    These are the Bitwarden item IDs for your SSH keys (not passwords)."
+  echo "    Find them with: bw list items --search 'SSH Key'"
+  echo ""
+  read -rp "    Bitwarden item ID for id_ed25519:   " BW_ID_ED25519
+  read -rp "    Bitwarden item ID for id_rsa_akiro: " BW_ID_RSA_AKIRO
+  mkdir -p "$(dirname "$CHEZMOI_CONFIG")"
+  if grep -q "sourceDir" "$CHEZMOI_CONFIG" 2>/dev/null; then
+    # Config exists, append [data] section
+    cat >> "$CHEZMOI_CONFIG" <<EOF
+
+[data]
+  bw_id_ed25519 = "$BW_ID_ED25519"
+  bw_id_rsa_akiro = "$BW_ID_RSA_AKIRO"
+EOF
+  else
+    # Config doesn't exist, create it
+    cat > "$CHEZMOI_CONFIG" <<EOF
+sourceDir = "~/workspace/dotfiles"
+
+[data]
+  bw_id_ed25519 = "$BW_ID_ED25519"
+  bw_id_rsa_akiro = "$BW_ID_RSA_AKIRO"
+EOF
+  fi
+  echo "==> Saved to $CHEZMOI_CONFIG"
+fi
+
+# 6. Brew bundle — installs all packages including bitwarden-cli and fish
 echo "==> Installing packages from Brewfile..."
 brew bundle --file="$(chezmoi source-path)/Brewfile"
 
-# 6. Bitwarden — unlock for SSH key retrieval
+# 7. Bitwarden — unlock for SSH key retrieval
 BW_STATUS="$(bw status 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unauthenticated'))" 2>/dev/null || echo "unauthenticated")"
 
 if [ "$BW_STATUS" = "unauthenticated" ]; then
@@ -58,11 +90,11 @@ else
   echo "==> Bitwarden already unlocked."
 fi
 
-# 7. Apply dotfiles (includes SSH key retrieval from Bitwarden)
+# 8. Apply dotfiles (includes SSH key retrieval from Bitwarden)
 echo "==> Applying dotfiles..."
 chezmoi apply
 
-# 8. Set fish as default shell
+# 9. Set fish as default shell
 FISH_PATH="$(command -v fish 2>/dev/null)"
 if [ -z "$FISH_PATH" ]; then
   BREW_PREFIX="$(brew --prefix 2>/dev/null || echo /opt/homebrew)"
@@ -79,7 +111,7 @@ if [ -f "$FISH_PATH" ]; then
   fi
 fi
 
-# 9. Fisher plugins
+# 10. Fisher plugins
 echo "==> Installing fish plugins..."
 "$FISH_PATH" -c "fisher update" 2>/dev/null || echo "Note: fisher update failed, run manually: fisher update"
 
