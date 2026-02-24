@@ -5,7 +5,7 @@ if status is-interactive
 end
 
 # Added by Antigravity
-fish_add_path /Users/rafal/.antigravity/antigravity/bin
+test -d $HOME/.antigravity/antigravity/bin && fish_add_path $HOME/.antigravity/antigravity/bin
 
 # Added by OrbStack
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :
