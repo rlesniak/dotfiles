@@ -21,6 +21,13 @@ if ! command -v brew &>/dev/null; then
   fi
 fi
 
+# Ensure brew is in PATH (works on both Apple Silicon and Intel)
+if [ -f /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -f /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # 3. chezmoi
 if ! command -v chezmoi &>/dev/null; then
   echo "==> Installing chezmoi..."
@@ -36,7 +43,12 @@ echo "==> Installing packages from Brewfile..."
 brew bundle --file="$(chezmoi source-path)/Brewfile"
 
 # 6. Set fish as default shell
-FISH_PATH="$(command -v fish 2>/dev/null || echo /opt/homebrew/bin/fish)"
+FISH_PATH="$(command -v fish 2>/dev/null)"
+if [ -z "$FISH_PATH" ]; then
+  # Fallback: detect brew prefix
+  BREW_PREFIX="$(brew --prefix 2>/dev/null || echo /opt/homebrew)"
+  FISH_PATH="$BREW_PREFIX/bin/fish"
+fi
 if [ -f "$FISH_PATH" ]; then
   if ! grep -qF "$FISH_PATH" /etc/shells; then
     echo "==> Adding fish to /etc/shells..."
