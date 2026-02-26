@@ -69,7 +69,7 @@ mkdir -p ~/workspace/dotfiles/home/dot_config/fish
 
 **Step 2: Dodaj config.fish**
 
-Zawartość pliku (OrbStack i Antigravity są instalowane przez bootstrap, więc zostawiamy):
+Zawartość pliku (OrbStack są instalowane przez bootstrap, więc zostawiamy):
 
 ```fish
 if status is-interactive
@@ -77,9 +77,6 @@ if status is-interactive
     set -gx PATH $PATH $ANDROID_HOME/emulator
     set -gx PATH $PATH $ANDROID_HOME/platform-tools
 end
-
-# Added by Antigravity
-fish_add_path /Users/rafal/.antigravity/antigravity/bin
 
 # Added by OrbStack
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :
