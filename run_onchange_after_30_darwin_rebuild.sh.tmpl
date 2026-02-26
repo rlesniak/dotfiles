@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# nix config hash: {{ include "flake.nix" | sha256sum }} {{ include "nix/darwin.nix" | sha256sum }} {{ include "nix/homebrew.nix" | sha256sum }}
+set -euo pipefail
+
+CHEZMOI_SOURCE="$(chezmoi source-path)"
+
+if ! command -v darwin-rebuild &>/dev/null; then
+  echo "==> darwin-rebuild not found — bootstrapping nix-darwin for the first time..."
+  nix run github:LnL7/nix-darwin -- switch --flake "${CHEZMOI_SOURCE}#macbook"
+else
+  echo "==> nix files changed — running darwin-rebuild switch..."
+  darwin-rebuild switch --flake "${CHEZMOI_SOURCE}#macbook"
+fi
+
+echo "==> darwin-rebuild complete."

@@ -1,3 +1,10 @@
-# VS Code - managed by run_once_after_vscode.sh instead
+# VS Code - managed by run_onchange_after_vscode.sh instead
 .config/vscode
 .config/vscode/**
+
+# Nix — not dotfiles, live in the repo root for darwin-rebuild to consume
+# (chezmoi already ignores these since they have no dot_ prefix, listed here for clarity)
+flake.nix
+flake.lock
+nix
+nix/**

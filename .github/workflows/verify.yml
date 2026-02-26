@@ -11,21 +11,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install chezmoi
         run: sh -c "$(curl -fsLS get.chezmoi.io)"
 
-      - name: Test template syntax
+      - name: Test chezmoi template syntax
         run: |
-          # Create a dummy config to test templates against
           cat > chezmoi.toml <<EOF
           [data]
             git_email = "test@example.com"
             bw_id_rlesniak = "dummy"
             bw_id_rsa_akiro = "dummy"
           EOF
-          
-          # Check for templating errors without applying
-          # Note: We can't fully apply because it requires Bitwarden
+
           ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < dot_gitconfig.tmpl
-          ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < run_onchange_after_10_brewfile.sh.tmpl
+          ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < run_onchange_after_30_darwin_rebuild.sh.tmpl
+
+  verify-nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Check flake
+        run: nix flake check --no-build
+
+      - name: Show flake outputs
+        run: nix flake show
