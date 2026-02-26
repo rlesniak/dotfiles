@@ -1,0 +1,35 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-handoff"
+  ],
+  "theme": "catpuccin-frappe",
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app"
+    },
+    "exa": {
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp"
+    }
+  },
+  "permission": {
+    "bash": {
+      "git push": "ask"
+    },
+    "jira_createJiraIssue": "ask",
+    "jira_editJiraIssue": "ask",
+    "jira_addCommentToJiraIssue": "ask",
+    "jira_transitionJiraIssue": "ask",
+    "jira_addWorklogToJiraIssue": "ask",
+    "jira_createConfluencePage": "ask",
+    "jira_updateConfluencePage": "ask",
+    "jira_createConfluenceFooterComment": "ask",
+    "jira_createConfluenceInlineComment": "ask"
+  }
+}
