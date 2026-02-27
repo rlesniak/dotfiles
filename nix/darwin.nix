@@ -12,10 +12,9 @@ in {
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    warn-dirty = false;
-  };
+  # Determinate Systems installer manages Nix — disable nix-darwin's own management.
+  # Determinate enables flakes and nix-command by default, so no extra settings needed.
+  nix.enable = false;
 
   # Required — tracks nix-darwin state version, do not change after init
   system.stateVersion = 5;
