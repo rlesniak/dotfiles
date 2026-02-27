@@ -73,7 +73,8 @@ BW_STATUS="$(bw status 2>/dev/null \
 
 if [[ "$BW_STATUS" == "unauthenticated" ]]; then
   echo "==> Logging into Bitwarden..."
-  export BW_SESSION="$(bw login --raw)"
+  bw login
+  export BW_SESSION="$(bw unlock --raw)"
 elif [[ "$BW_STATUS" == "locked" ]]; then
   echo "==> Unlocking Bitwarden..."
   export BW_SESSION="$(bw unlock --raw)"
