@@ -73,7 +73,11 @@ BW_STATUS="$(bw status 2>/dev/null \
 
 if [[ "$BW_STATUS" == "unauthenticated" ]]; then
   echo "==> Logging into Bitwarden..."
-  bw login
+  read -r BW_EMAIL
+
+  # Przekierowanie standardowego wejścia z terminala
+  bw login "$BW_EMAIL" --method 0 # --method 0 wymusza hasło/standardowe logowanie
+
   export BW_SESSION="$(bw unlock --raw)"
 elif [[ "$BW_STATUS" == "locked" ]]; then
   echo "==> Unlocking Bitwarden..."
@@ -99,7 +103,7 @@ CHEZMOI_SOURCE="$(chezmoi source-path)"
 ###############################################################################
 
 echo "==> Bootstrapping nix-darwin (this will take a few minutes)..."
-nix run github:LnL7/nix-darwin -- switch --flake "${CHEZMOI_SOURCE}#macbook"
+NIX_USER="$(whoami)" sudo --preserve-env=NIX_USER nix run github:LnL7/nix-darwin -- switch --flake "${CHEZMOI_SOURCE}#macbook" --impure
 
 ###############################################################################
 # 9. Apply chezmoi dotfiles                                                   #

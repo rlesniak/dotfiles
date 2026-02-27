@@ -1,7 +1,7 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, username, ... }:
 
 let
-  user = "rafallesniak";
+  user = username;
   home = "/Users/${user}";
 in {
   imports = [ ./homebrew.nix ];
@@ -19,6 +19,9 @@ in {
 
   # Required — tracks nix-darwin state version, do not change after init
   system.stateVersion = 5;
+
+  # Required by new nix-darwin for user-specific options (homebrew, defaults, etc.)
+  system.primaryUser = user;
 
   ###########################################################################
   # Users                                                                   #
@@ -160,13 +163,13 @@ in {
   # Activation scripts                                                      #
   ###########################################################################
 
-  system.activationScripts.postUserActivation.text = ''
+  system.activationScripts.postActivation.text = ''
     # Create screenshot destination folder
-    mkdir -p "${home}/SS"
+    sudo -u ${user} mkdir -p "${home}/SS"
 
     # Bounce Dock and Finder so all defaults take effect immediately
-    /usr/bin/killall Dock    2>/dev/null || true
-    /usr/bin/killall Finder  2>/dev/null || true
-    /usr/bin/killall SystemUIServer 2>/dev/null || true
+    sudo -u ${user} /usr/bin/killall Dock    2>/dev/null || true
+    sudo -u ${user} /usr/bin/killall Finder  2>/dev/null || true
+    sudo -u ${user} /usr/bin/killall SystemUIServer 2>/dev/null || true
   '';
 }
