@@ -30,7 +30,7 @@ elif [[ -f /usr/local/bin/brew ]]; then
 fi
 
 ###############################################################################
-# 3. chezmoi + age                                                             #
+# 3. chezmoi                                                                   #
 ###############################################################################
 
 if ! command -v chezmoi &>/dev/null; then
@@ -38,32 +38,8 @@ if ! command -v chezmoi &>/dev/null; then
   brew install chezmoi
 fi
 
-if ! command -v age &>/dev/null; then
-  echo "==> Installing age..."
-  brew install age
-fi
-
 ###############################################################################
-# 4. age key                                                                   #
-###############################################################################
-
-AGE_KEY="$HOME/.config/chezmoi/key.txt"
-
-if [[ ! -f "$AGE_KEY" ]]; then
-  echo ""
-  echo "==> age key not found at $AGE_KEY"
-  echo "    Paste the contents of your age key (from Bitwarden safe note),"
-  echo "    then press Ctrl+D when done:"
-  echo ""
-  mkdir -p "$(dirname "$AGE_KEY")"
-  cat > "$AGE_KEY"
-  chmod 600 "$AGE_KEY"
-  echo ""
-  echo "==> age key saved."
-fi
-
-###############################################################################
-# 5. Clone dotfiles + apply                                                    #
+# 4. Clone dotfiles + apply                                                    #
 ###############################################################################
 
 echo "==> Initializing chezmoi..."
@@ -74,6 +50,7 @@ chezmoi apply
 
 echo ""
 echo "==> Bootstrap complete!"
-echo "  1. SSH keys decrypted from repo automatically."
-echo "  2. Log in to your applications (Raycast, etc.)"
-echo "  3. Restart your terminal."
+echo "  1. Open Bitwarden Desktop, enable SSH Agent in Settings."
+echo "  2. Import your SSH keys into Bitwarden vault."
+echo "  3. Log in to your applications (Raycast, etc.)"
+echo "  4. Restart your terminal."

@@ -1,6 +1,5 @@
 tap "tw93/tap"
 
-brew "age"
 brew "bat"
 brew "chezmoi"
 brew "coreutils"
@@ -17,6 +16,7 @@ brew "tw93/tap/snitch"
 
 cask "arc"
 cask "bambu-studio"
+cask "bitwarden"
 cask "font-monaspace"
 cask "font-source-code-pro"
 cask "font-source-code-pro-for-powerline"

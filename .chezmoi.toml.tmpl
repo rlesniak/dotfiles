@@ -2,10 +2,5 @@
 
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
-encryption = "age"
-[age]
-  identity = "~/.config/chezmoi/key.txt"
-  recipient = "age1juntqvwgghypr8yekngag2xkwwra7hlquaxpc044n93qn6yp6qvqrxvl8k"
-
 [data]
   git_email = {{ $email | quote }}

@@ -1,4 +1,5 @@
 # SSH config managed by chezmoi.
+# SSH keys are served by Bitwarden SSH Agent — no IdentityFile needed.
 # Note: OrbStack adds its own Include block automatically after installation.
 # VPS-specific hosts (IPs) are not tracked here — add them manually per machine.
 
@@ -6,20 +7,14 @@
 Host private
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_rlesniak
-    IdentitiesOnly yes
 
 # Company GitHub Account
 Host akiro
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_akiro
-    IdentitiesOnly yes
 
 # GitHub via port 443 (if port 22 is blocked)
 Host github.com
     HostName ssh.github.com
     Port 443
     User git
-    IdentityFile ~/.ssh/id_rlesniak
-    IdentitiesOnly yes
