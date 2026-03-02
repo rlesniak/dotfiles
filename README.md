@@ -1,16 +1,23 @@
 # dotfiles
 
-Rafal's macOS configuration managed by [chezmoi](https://chezmoi.io) + [nix-darwin](https://github.com/LnL7/nix-darwin).
+Rafal's macOS configuration managed by [chezmoi](https://chezmoi.io).
 
 | Concern | Tool |
 |---|---|
-| System defaults + Homebrew packages | nix-darwin (`nix/darwin.nix`, `nix/homebrew.nix`) |
-| Dotfiles (fish, zed, vscode, SSH keys) | chezmoi |
-| Secrets (SSH private keys) | Bitwarden via `bw` CLI |
+| Packages (brew, cask, App Store) | Homebrew via `Brewfile` |
+| macOS defaults (Dock, Finder, keyboard) | `defaults write` script |
+| Dotfiles (fish, zed, SSH keys, git) | chezmoi |
+| Secrets (SSH private keys) | [age](https://github.com/FiloSottile/age) encryption |
 
 ---
 
 ## Bootstrap on a new Mac
+
+### Prerequisites
+
+Your age private key must be stored as a Secure Note in Bitwarden. On the new Mac, copy-paste it when prompted.
+
+### Run
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/rlesniak/dotfiles/main/bootstrap.sh | bash
@@ -19,13 +26,11 @@ curl -fsSL https://raw.githubusercontent.com/rlesniak/dotfiles/main/bootstrap.sh
 What it does, in order:
 
 1. Installs Xcode CLI tools
-2. Installs **Nix** (Determinate Systems installer — flakes enabled by default)
-3. Installs **Homebrew** (nix-darwin manages packages, but `brew` itself must exist)
-4. Installs chezmoi + Bitwarden CLI via brew
-5. Unlocks Bitwarden (prompts for master password)
-6. Clones this repo via `chezmoi init`
-7. Runs `nix-darwin` for the first time — applies all system defaults and installs all Homebrew packages
-8. Runs `chezmoi apply` — deploys dotfiles and downloads SSH keys from Bitwarden
+2. Installs **Homebrew**
+3. Installs chezmoi + age via brew
+4. Prompts you to paste your **age key** (from Bitwarden) — saved to `~/.config/chezmoi/key.txt`
+5. Clones this repo via `chezmoi init`
+6. Runs `chezmoi apply` — installs all brew packages, applies macOS defaults, decrypts and deploys SSH keys, deploys dotfiles
 
 After bootstrap: restart your terminal, then log in to Raycast, Arc, etc.
 
@@ -38,30 +43,36 @@ After bootstrap: restart your terminal, then log in to Raycast, Arc, etc.
 | Edit a dotfile | `chezmoi edit ~/.config/fish/config.fish` |
 | Sync a changed file back into the repo | `chezmoi re-add ~/.config/fish/config.fish` |
 | Apply dotfile changes | `chezmoi apply` |
-| Add a Homebrew package | Edit `nix/homebrew.nix`, then `chezmoi apply` |
-| Change a macOS default | Edit `nix/darwin.nix`, then `chezmoi apply` |
-| Rebuild nix-darwin manually | `darwin-rebuild switch --flake $(chezmoi source-path)#macbook` |
+| Add a Homebrew package | Edit `Brewfile`, then `chezmoi apply` |
+| Change a macOS default | Edit `run_onchange_after_20_macos_defaults.sh`, then `chezmoi apply` |
+| Add an encrypted file | `chezmoi add --encrypt ~/.ssh/id_new_key` |
 | Push changes | `chezmoi cd && git add -A && git commit -m "..." && git push` |
 | Sync on another Mac | `chezmoi update` |
 
-> `chezmoi apply` automatically triggers `darwin-rebuild switch` whenever any file inside `nix/` or `flake.nix` changes (tracked by `run_onchange_after_30_darwin_rebuild.sh.tmpl`).
+> `chezmoi apply` automatically runs `brew bundle` when `Brewfile` changes and re-applies macOS defaults when the defaults script changes.
 
 ---
 
-## Bitwarden — SSH keys
+## Secrets — age encryption
 
-SSH private keys are stored as Secure Notes in Bitwarden:
+SSH private keys are encrypted with [age](https://github.com/FiloSottile/age) and stored directly in the repo. chezmoi decrypts them automatically on `chezmoi apply`.
 
-- `SSH Key: id_rlesniak` — personal GitHub
-- `SSH Key: id_rsa_akiro` — company GitHub
+**age key** (`~/.config/chezmoi/key.txt`) is stored as a Secure Note in Bitwarden — copy it manually on a new Mac during bootstrap.
 
-During bootstrap, the script unlocks Bitwarden and `chezmoi apply` pulls the key contents via `bw get notes <id>`. Keys are written to `~/.ssh/` with `0600` permissions.
-
-To manually refresh keys:
+### One-time setup (already done)
 
 ```bash
-export BW_SESSION="$(bw unlock --raw)"
-chezmoi apply ~/.ssh/id_rlesniak ~/.ssh/id_rsa_akiro
+# Generate age keypair
+age-keygen -o ~/.config/chezmoi/key.txt
+
+# Save the public key (age1...) — needed for .chezmoi.toml.tmpl recipient field
+cat ~/.config/chezmoi/key.txt | grep "public key"
+
+# Add SSH keys as encrypted files
+chezmoi add --encrypt ~/.ssh/id_rlesniak
+chezmoi add --encrypt ~/.ssh/id_rsa_akiro
+
+# Save ~/.config/chezmoi/key.txt as a Secure Note in Bitwarden
 ```
 
 ---
@@ -70,16 +81,12 @@ chezmoi apply ~/.ssh/id_rlesniak ~/.ssh/id_rsa_akiro
 
 ```
 dotfiles/
-├── flake.nix                              # nix-darwin entry point
-├── flake.lock                             # pinned nix dependency versions
-├── nix/
-│   ├── darwin.nix                         # macOS defaults + activation scripts
-│   └── homebrew.nix                       # all Homebrew packages (replaces Brewfile)
-│
+├── Brewfile                               # all Homebrew packages (brew, cask, mas)
 ├── bootstrap.sh                           # one-command setup for a new Mac
 │
-├── run_onchange_after_30_darwin_rebuild.sh.tmpl  # triggers darwin-rebuild on nix changes
-├── run_once_after_40_setup_fish.sh        # sets fish as default shell (runs once)
+├── run_onchange_after_10_brew_bundle.sh.tmpl  # runs brew bundle when Brewfile changes
+├── run_onchange_after_20_macos_defaults.sh    # applies macOS defaults when script changes
+├── run_once_after_40_setup_fish.sh            # sets fish as default shell (runs once)
 │
 ├── dot_gitconfig.tmpl                     # ~/.gitconfig (email injected from chezmoi)
 │
@@ -92,21 +99,6 @@ dotfiles/
 │
 └── dot_ssh/
     ├── private_config                     # SSH host aliases
-    ├── private_id_rlesniak.tmpl           # pulled from Bitwarden at apply time
-    └── private_id_rsa_akiro.tmpl          # pulled from Bitwarden at apply time
+    ├── encrypted_private_id_rlesniak.age  # age-encrypted SSH key (personal)
+    └── encrypted_private_id_rsa_akiro.age # age-encrypted SSH key (company)
 ```
-
----
-
-## Updating nix-darwin
-
-```bash
-# Update flake inputs (nixpkgs, nix-darwin) to latest
-darwin-rebuild switch --flake $(chezmoi source-path)#macbook --recreate-lock-file
-
-# Or just bump a specific input
-nix flake update nixpkgs --flake $(chezmoi source-path)
-darwin-rebuild switch --flake $(chezmoi source-path)#macbook
-```
-
-Commit `flake.lock` after updating to pin the new versions.

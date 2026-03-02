@@ -20,23 +20,7 @@ jobs:
           cat > chezmoi.toml <<EOF
           [data]
             git_email = "test@example.com"
-            bw_id_rlesniak = "dummy"
-            bw_id_rsa_akiro = "dummy"
           EOF
 
           ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < dot_gitconfig.tmpl
-          ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < run_onchange_after_30_darwin_rebuild.sh.tmpl
-
-  verify-nix:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Check flake
-        run: nix flake check --no-build
-
-      - name: Show flake outputs
-        run: nix flake show
+          ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < run_onchange_after_10_brew_bundle.sh.tmpl

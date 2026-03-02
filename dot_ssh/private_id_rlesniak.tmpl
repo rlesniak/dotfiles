@@ -1,5 +1,0 @@
-{{- if eq (output "bw" "status" | fromJson).status "unlocked" -}}
-{{ (bitwarden "item" .bw_id_rlesniak).notes }}
-{{- else -}}
-{{ include (joinPath .chezmoi.homeDir ".ssh/id_rlesniak") }}
-{{- end -}}

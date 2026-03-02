@@ -15,23 +15,7 @@ if ! xcode-select -p &>/dev/null; then
 fi
 
 ###############################################################################
-# 2. Nix (Determinate Systems installer — enables flakes by default)         #
-###############################################################################
-
-if ! command -v nix &>/dev/null; then
-  echo "==> Installing Nix..."
-  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
-    | sh -s -- install --no-confirm
-fi
-
-# Source nix into the current shell session
-if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-  # shellcheck source=/dev/null
-  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-fi
-
-###############################################################################
-# 3. Homebrew (nix-darwin's homebrew module manages packages, not brew itself)#
+# 2. Homebrew                                                                  #
 ###############################################################################
 
 if ! command -v brew &>/dev/null; then
@@ -46,7 +30,7 @@ elif [[ -f /usr/local/bin/brew ]]; then
 fi
 
 ###############################################################################
-# 4. chezmoi                                                                  #
+# 3. chezmoi + age                                                             #
 ###############################################################################
 
 if ! command -v chezmoi &>/dev/null; then
@@ -54,67 +38,42 @@ if ! command -v chezmoi &>/dev/null; then
   brew install chezmoi
 fi
 
-###############################################################################
-# 5. Bitwarden CLI (needed BEFORE chezmoi apply — SSH key templates use it)  #
-###############################################################################
-
-if ! command -v bw &>/dev/null; then
-  echo "==> Installing Bitwarden CLI..."
-  brew install bitwarden-cli
+if ! command -v age &>/dev/null; then
+  echo "==> Installing age..."
+  brew install age
 fi
 
 ###############################################################################
-# 6. Bitwarden unlock                                                         #
+# 4. age key                                                                   #
 ###############################################################################
 
-BW_STATUS="$(bw status 2>/dev/null \
-  | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unauthenticated'))" \
-  2>/dev/null || echo "unauthenticated")"
+AGE_KEY="$HOME/.config/chezmoi/key.txt"
 
-if [[ "$BW_STATUS" == "unauthenticated" ]]; then
-  echo "==> Logging into Bitwarden..."
-  read -r BW_EMAIL
-
-  # Przekierowanie standardowego wejścia z terminala
-  bw login "$BW_EMAIL" --method 0 # --method 0 wymusza hasło/standardowe logowanie
-
-  export BW_SESSION="$(bw unlock --raw)"
-elif [[ "$BW_STATUS" == "locked" ]]; then
-  echo "==> Unlocking Bitwarden..."
-  export BW_SESSION="$(bw unlock --raw)"
-else
-  echo "==> Bitwarden already unlocked."
+if [[ ! -f "$AGE_KEY" ]]; then
+  echo ""
+  echo "==> age key not found at $AGE_KEY"
+  echo "    Paste the contents of your age key (from Bitwarden safe note),"
+  echo "    then press Ctrl+D when done:"
+  echo ""
+  mkdir -p "$(dirname "$AGE_KEY")"
+  cat > "$AGE_KEY"
+  chmod 600 "$AGE_KEY"
+  echo ""
+  echo "==> age key saved."
 fi
 
 ###############################################################################
-# 7. Clone dotfiles repo (without applying yet — nix-darwin needs the flake) #
+# 5. Clone dotfiles + apply                                                    #
 ###############################################################################
 
-echo "==> Cloning dotfiles..."
-# init without --apply: clones repo + writes chezmoi.toml, does not touch $HOME
+echo "==> Initializing chezmoi..."
 chezmoi init https://github.com/rlesniak/dotfiles.git
-
-CHEZMOI_SOURCE="$(chezmoi source-path)"
-
-###############################################################################
-# 8. Bootstrap nix-darwin                                                     #
-#    First run uses `nix run` because darwin-rebuild doesn't exist yet.       #
-#    This also installs all Homebrew packages declared in nix/homebrew.nix.   #
-###############################################################################
-
-echo "==> Bootstrapping nix-darwin (this will take a few minutes)..."
-NIX_USER="$(whoami)" sudo --preserve-env=NIX_USER nix run github:LnL7/nix-darwin -- switch --flake "${CHEZMOI_SOURCE}#macbook" --impure
-
-###############################################################################
-# 9. Apply chezmoi dotfiles                                                   #
-#    darwin-rebuild is now in PATH; homebrew packages are installed.          #
-###############################################################################
 
 echo "==> Applying dotfiles..."
 chezmoi apply
 
 echo ""
 echo "==> Bootstrap complete!"
-echo "  1. SSH keys downloaded automatically from Bitwarden."
+echo "  1. SSH keys decrypted from repo automatically."
 echo "  2. Log in to your applications (Raycast, etc.)"
-echo "  3. Restart your terminal"
+echo "  3. Restart your terminal."

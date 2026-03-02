@@ -13,7 +13,7 @@ Host private
 Host akiro
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_rsa_akiro
+    IdentityFile ~/.ssh/id_akiro
     IdentitiesOnly yes
 
 # GitHub via port 443 (if port 22 is blocked)

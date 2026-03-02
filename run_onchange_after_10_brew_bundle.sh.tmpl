@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Brewfile hash: {{ include "Brewfile" | sha256sum }}
+set -euo pipefail
+
+echo "==> Running brew bundle..."
+CHEZMOI_SOURCE="$(chezmoi source-path)"
+brew bundle --file="${CHEZMOI_SOURCE}/Brewfile" --no-lock
+echo "==> brew bundle complete."
