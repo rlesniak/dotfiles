@@ -3,7 +3,7 @@
   "plugin": [
     "opencode-handoff"
   ],
-  "theme": "catpuccin-frappe",
+  "small_model": "github-copilot/gemini-3-flash-preview",
   "mcp": {
     "context7": {
       "type": "remote",
