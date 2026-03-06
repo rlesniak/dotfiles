@@ -4,5 +4,5 @@ set -euo pipefail
 
 echo "==> Running brew bundle..."
 CHEZMOI_SOURCE="{{ .chezmoi.sourceDir }}"
-brew bundle --file="${CHEZMOI_SOURCE}/Brewfile" --no-lock
+brew bundle --file="${CHEZMOI_SOURCE}/Brewfile"
 echo "==> brew bundle complete."

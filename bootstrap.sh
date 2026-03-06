@@ -3,10 +3,6 @@ set -euo pipefail
 
 echo "==> Starting dotfiles bootstrap..."
 
-###############################################################################
-# 1. Xcode CLI tools                                                          #
-###############################################################################
-
 if ! xcode-select -p &>/dev/null; then
   echo "==> Installing Xcode CLI tools..."
   xcode-select --install
@@ -14,39 +10,20 @@ if ! xcode-select -p &>/dev/null; then
   exit 1
 fi
 
-###############################################################################
-# 2. Homebrew                                                                  #
-###############################################################################
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply --force https://github.com/rlesniak/dotfiles.git
 
-if ! command -v brew &>/dev/null; then
-  echo "==> Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo "==> Fixing git remote to use HTTPS..."
+CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
+if [[ -d "$CHEZMOI_SOURCE" ]]; then
+  cd "$CHEZMOI_SOURCE"
+  CURRENT_URL=$(git remote get-url origin 2>/dev/null || echo "")
+  if [[ "$CURRENT_URL" == git@github.com:* ]]; then
+    REPO_PATH="${CURRENT_URL#git@github.com:}"
+    HTTPS_URL="https://github.com/${REPO_PATH}"
+    git remote set-url origin "$HTTPS_URL"
+    echo "==> Remote URL changed to: $HTTPS_URL"
+  fi
 fi
-
-if [[ -f /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [[ -f /usr/local/bin/brew ]]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
-
-###############################################################################
-# 3. chezmoi                                                                   #
-###############################################################################
-
-if ! command -v chezmoi &>/dev/null; then
-  echo "==> Installing chezmoi..."
-  brew install chezmoi
-fi
-
-###############################################################################
-# 4. Clone dotfiles + apply                                                    #
-###############################################################################
-
-echo "==> Initializing chezmoi..."
-chezmoi init https://github.com/rlesniak/dotfiles.git
-
-echo "==> Applying dotfiles..."
-chezmoi apply
 
 echo ""
 echo "==> Bootstrap complete!"
