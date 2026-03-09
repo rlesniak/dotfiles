@@ -1,9 +1,22 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "opencode-handoff"
+    "opencode-handoff",
+     "opencode-copilot-auth@latest"
   ],
   "small_model": "github-copilot/gemini-3-flash-preview",
+  "provider": {
+    "github-copilot": {
+      "models": {
+        "gpt-5.3-codex": {
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
+      }
+    }
+  },
   "mcp": {
     "context7": {
       "type": "remote",
