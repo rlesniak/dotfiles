@@ -10,20 +10,13 @@ if ! xcode-select -p &>/dev/null; then
   exit 1
 fi
 
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply --force https://github.com/rlesniak/dotfiles.git
-
-echo "==> Fixing git remote to use HTTPS..."
-CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
-if [[ -d "$CHEZMOI_SOURCE" ]]; then
-  cd "$CHEZMOI_SOURCE"
-  CURRENT_URL=$(git remote get-url origin 2>/dev/null || echo "")
-  if [[ "$CURRENT_URL" == git@github.com:* ]]; then
-    REPO_PATH="${CURRENT_URL#git@github.com:}"
-    HTTPS_URL="https://github.com/${REPO_PATH}"
-    git remote set-url origin "$HTTPS_URL"
-    echo "==> Remote URL changed to: $HTTPS_URL"
-  fi
+if ! command -v brew &>/dev/null; then
+  echo "==> Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
+
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply --force https://github.com/rlesniak/dotfiles.git
 
 echo ""
 echo "==> Bootstrap complete!"

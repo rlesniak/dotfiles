@@ -1,3 +1,7 @@
 # VS Code - managed externally
 .config/vscode
 .config/vscode/**
+
+# Implementation notes - not needed on target machines
+docs/plans
+docs/plans/**

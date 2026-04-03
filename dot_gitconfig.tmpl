@@ -1,3 +1,21 @@
 [user]
 	email = {{ .git_email }}
 	name = Rafal Lesniak
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+
+[push]
+	autoSetupRemote = true
+
+[commit]
+	gpgsign = false
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

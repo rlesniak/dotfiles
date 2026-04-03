@@ -1,4 +1,4 @@
-term = xterm-256color
+term = ghostty
 
 macos-non-native-fullscreen = true
 macos-option-as-alt = left
@@ -30,9 +30,6 @@ palette = 13=#FF7AEA
 palette = 14=#00FEFE
 palette = 15=#FFFFFF
 font-family = Monaspace Krypton
-#font-family-bold = JetBrains Mono Bold
-#font-family-italic = JetBrains Mono Italic
-#font-family-bold-italic = JetBrains Mono Bold Italic
 font-size = 16
 font-thicken = true
 adjust-cursor-thickness = 175%

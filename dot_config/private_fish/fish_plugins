@@ -1,5 +1,5 @@
-patrickf1/fzf.fish
 jorgebucaran/fisher
-pure-fish/pure
-jhillyerd/plugin-git
+jorgebucaran/nvm.fish
 ilancosman/tide@v6
+jhillyerd/plugin-git
+reitzig/sdkman-for-fish@v2.0.0
