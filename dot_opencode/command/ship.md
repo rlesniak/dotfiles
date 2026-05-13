@@ -8,7 +8,7 @@ Commit current changes and create a pull request. Uses `conventional-commit` ski
 
 1. **Commit phase** — follow `/commit` workflow:
    - Check state: `git status --porcelain && git diff --cached --stat`
-   - If on `main`/`master` → create topic branch automatically
+   - If on `main`/`master`/`develop` → create topic branch automatically
    - Stage if nothing staged but changes exist
    - Analyze diff for atomic commit opportunities
    - Generate message using conventional-commit skill format
