@@ -1,3 +1,11 @@
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# {{ $isDarwin := eq .chezmoi.os "darwin" -}}
+# {{ $hostname := .chezmoi.hostname -}}
+
+# Packages outside conditionals install on every host that uses this repo.
+# Use OS conditionals for platform-specific packages and hostname conditionals
+# only when a machine genuinely needs different tools.
+
 tap "tw93/tap"
 
 brew "bat"
@@ -8,13 +16,13 @@ brew "fish"
 brew "fzf"
 brew "gh"
 brew "git"
-brew "mas"
-brew "snitch"
 brew "watchman"
 brew "tw93/tap/mole"
 
-cask "arc"
-cask "bambu-studio"
+# {{ if $isDarwin -}}
+brew "mas"
+
+cask "arc"d
 cask "bitwarden"
 cask "font-geist-mono"
 cask "font-jetbrains-mono"
@@ -24,6 +32,7 @@ cask "font-source-code-pro"
 cask "font-source-code-pro-for-powerline"
 cask "ghostty"
 cask "github"
+cask "handy"
 cask "orbstack"
 cask "raycast"
 cask "stats"
@@ -36,3 +45,8 @@ cask "zen"
 cask "zulu@17"
 
 mas "Xcode", id: 497799835
+# {{ end -}}
+
+# {{ if eq $hostname "work-mac" -}}
+# Add host-specific packages here when a machine truly needs them.
+# {{ end -}}

@@ -1,3 +1,10 @@
+# Repo files - not managed target files
+README.md
+bootstrap.sh
+chezmoi.toml
+.github
+.github/**
+
 # VS Code - managed externally
 .config/vscode
 .config/vscode/**

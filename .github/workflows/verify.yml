@@ -7,20 +7,41 @@ on:
     branches: [ main ]
 
 jobs:
-  verify-templates:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
       - name: Install chezmoi
         run: sh -c "$(curl -fsLS get.chezmoi.io)"
 
-      - name: Test chezmoi template syntax
+      - name: Create test chezmoi config
         run: |
           cat > chezmoi.toml <<EOF
+          sourceDir = "$PWD"
+
           [data]
+            git_name = "Test User"
             git_email = "test@example.com"
           EOF
 
-          ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < dot_gitconfig.tmpl
-          ./bin/chezmoi execute-template --source $PWD --config chezmoi.toml < run_onchange_after_10_brew_bundle.sh.tmpl
+      - name: Verify chezmoi templates render
+        run: |
+          ./bin/chezmoi execute-template --source "$PWD" --config chezmoi.toml < .chezmoi.toml.tmpl >/dev/null
+          ./bin/chezmoi execute-template --source "$PWD" --config chezmoi.toml < dot_Brewfile.tmpl >/dev/null
+          ./bin/chezmoi execute-template --source "$PWD" --config chezmoi.toml < dot_gitconfig.tmpl >/dev/null
+          ./bin/chezmoi execute-template --source "$PWD" --config chezmoi.toml < .chezmoiscripts/run_onchange_after_10_brew_bundle.sh.tmpl >/dev/null
+
+      - name: Lint shell scripts
+        run: shellcheck bootstrap.sh .chezmoiscripts/run_once_after_40_setup_fish.sh .chezmoiscripts/run_onchange_after_20_macos_defaults.sh
+
+      - name: Check for known private identifiers
+        run: |
+          ! rg -n -i \
+            -g '!dot_agents/**' \
+            -g '!.git/**' \
+            'Rafal|Lesniak|rafallesniak24@gmail\.com|rlesniak24|akirolabs|GitHub Private|GitHub Akiro|Host rlesniak|Host akiro|id_rlesniak|id_akiro' \
+            .

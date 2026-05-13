@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Brewfile hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
+set -euo pipefail
+
+echo "==> Running brew bundle..."
+CHEZMOI_DEST="{{ .chezmoi.destDir }}"
+brew bundle --file="${CHEZMOI_DEST}/.Brewfile"
+echo "==> brew bundle complete."

@@ -1,6 +1,17 @@
 {{- $email := promptStringOnce . "git_email" "Git email address" -}}
+{{- $name := promptStringOnce . "git_name" "Git name" -}}
 
+encryption = "age"
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
+[age]
+  identity = "~/.config/chezmoi/key.txt"
+  recipient = "age14n8ufekx5y7c343ltsw894ptds8zw7q03evzzntlyr65ae6m7eysnz6ghy"
+
+[git]
+  autoCommit = true
+  autoPush = true
+
 [data]
+  git_name = {{ $name | quote }}
   git_email = {{ $email | quote }}

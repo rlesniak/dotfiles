@@ -1,4 +1,13 @@
 {
+  "cli_default_open_behavior": "new_window",
+  "agent_servers": {
+    "opencode": {
+      "type": "registry"
+    }
+  },
+  "git_panel": {
+    "dock": "left"
+  },
   "edit_predictions": {
     "provider": "zed"
   },
@@ -18,17 +27,12 @@
     "show_type_hints": false
   },
   "agent": {
+    "dock": "right",
     "tool_permissions": {
       "default": "allow"
     },
     "default_profile": "write",
-    "favorite_models": [
-      {
-        "provider": "copilot_chat",
-        "model": "claude-opus-4.5"
-      }
-    ],
-    "play_sound_when_agent_done": true,
+    "play_sound_when_agent_done": "always",
     "default_model": {
       "provider": "copilot_chat",
       "model": "claude-sonnet-4.6"
@@ -47,6 +51,7 @@
   "ui_font_size": 18,
   "format_on_save": "off",
   "project_panel": {
+    "dock": "left",
     "auto_fold_dirs": false,
     "indent_size": 16
   },
@@ -82,9 +87,6 @@
     "metrics": false
   },
   "outline_panel": {
-    "dock": "right"
-  },
-  "notification_panel": {
     "dock": "right"
   }
 }
